@@ -1,5 +1,5 @@
 * Monkey Ruby
-  A Ruby implementation of the Monkey Programming Language. 
+  A Ruby interpreter for the Monkey Programming Language. 
 
 
   
