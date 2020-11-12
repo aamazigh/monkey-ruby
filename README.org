@@ -1,5 +1,6 @@
 * Monkey Ruby
-  A Ruby interpreter for the Monkey Programming Language. 
+  A interpreter for the Monkey Programming Language written in Ruby.
+  [[https://interpreterbook.com/][It is based on the book Writing An Interpreter in Go.]]
 
 
   
