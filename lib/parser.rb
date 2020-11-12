@@ -16,7 +16,6 @@ class Parser
   CALL = 7 # mFunction(X)
   INDEX = 8 # array[index]
 
-  # TODO: should I leave this as a constant?
   PRECEDENCES =
     {
       Token::EQ => EQUALS,

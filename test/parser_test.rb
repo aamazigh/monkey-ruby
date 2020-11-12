@@ -62,28 +62,6 @@ class TestParser < MiniTest::Test
     assert_equal value.to_s, expression.TokenLiteral
   end
 
-  def let_statement_test_helper(statement, name)
-    if statement.TokenLiteral != 'return'
-      puts "Statement.TokenLiteral not 'return'. Got #{statement.TokenLiteral}"
-      return false
-    end
-
-    letStmt = statement
-
-    if letStmt.name.value != name
-      puts "letStmt.Name.Value not #{name}. Got=#{letStmt.name.value}"
-      return false
-    end
-
-    if letStmt.name.TokenLiteral() != name
-      puts "#{Statement.name} not #{name}. Got=#{letStmt.name}"
-      return false
-    end
-
-    true
-  end
-
-
   def test_let_statements
     input = Struct.new(:input, :expected_identifier, :expected_value)
 
