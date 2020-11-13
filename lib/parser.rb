@@ -14,7 +14,7 @@ class Parser
   SUM = 4 # +
   PRODUCT = 5 # *
   PREFIX = 6 # -X or !X
-  CALL = 7 # mFunction(X)
+  CALL = 7 # Function(X)
   INDEX = 8 # array[index]
 
   PRECEDENCES =
@@ -31,57 +31,62 @@ class Parser
       Token::LBRACKET => INDEX
     }
 
-  def initialize(lexer)
-    @l = lexer
-    @errors = []
-    @prefix_parse_fns = {}
-    @infix_parse_fns = {}
-    next_token
-    next_token
-
-    # TODO: Should I leave these functions here?
-    parse_identifier = lambda {
+  def parse_identifier
+    lambda {
       Identifier.new(token: @curtoken,
                      value: @curtoken.literal)
     }
+  end
 
-    parse_integer_literal = lambda {
+  def parse_integer_literal
+    lambda {
       IntegerLiteral.new(token: @curtoken,
                          value: Integer(@curtoken.literal))
     }
+  end
 
-    parse_boolean = lambda {
+  def parse_boolean
+    lambda {
       Boolean.new(token: @curtoken,
                   value: curtoken_is?(Token::TRUE))
     }
+  end
 
-    parse_prefix_expression = lambda {
+  def parse_prefix_expression
+    lambda {
       expression = PrefixExpression.new(token: @curtoken,
                                         operator: @curtoken.literal)
       next_token
       expression.right = parse_expression(PREFIX)
       expression # return the prefix expression
     }
+  end
 
-    parse_infix_expression = lambda { |left|
-       expression = InfixExpression.new(token: @curtoken,
-                                              operator: @curtoken.literal,
-                                              left: left)
-       precedence = curprecedence
-       next_token
-       expression.right = parse_expression(precedence)
-       expression
+  def parse_infix_expression
+    lambda { |left|
+      expression = InfixExpression.new(token: @curtoken,
+                                       operator: @curtoken.literal,
+                                       left: left)
+      precedence = curprecedence
+      next_token
+      expression.right = parse_expression(precedence)
+      expression
     }
+  end
 
-    parse_grouped_expression = lambda {
+  def parse_grouped_expression
+    lambda {
       next_token
       exp = parse_expression(LOWEST)
 
       return nil unless expect_peek(Token::RPAREN)
+
       exp
     }
+  end
 
-    parse_if_expression = lambda {
+  def parse_if_expression
+    lambda {
       expression = IfExpression.new(token: @curtoken)
 
       return nil unless expect_peek(Token::LPAREN)
@@ -104,10 +109,11 @@ class Parser
       end
       expression
     }
+  end
 
-    parse_function_literal = lambda {
+  def parse_function_literal
+    lambda {
       lit = FunctionLiteral.new(token: @curtoken)
-
       return nil unless expect_peek(Token::LPAREN)
 
       lit.parameters = parse_function_parameters
@@ -118,27 +124,34 @@ class Parser
 
       lit
     }
+  end
 
-    parse_call_expression = lambda { |function|
+  def parse_call_expression
+    lambda { |function|
       exp = CallExpression.new(token: @curtoken, function: function)
-      #       exp.arguments = parse_call_arguments
       exp.arguments = parse_expression_list(Token::RPAREN)
 
       exp
     }
+  end
 
-    parse_string_literal = lambda {
+  def parse_string_literal
+    lambda {
       StringLiteral.new(token: @curtoken, value: @curtoken.literal)
     }
+  end
 
-    parse_array_literal = lambda {
+  def parse_array_literal
+    lambda {
       array = ArrayLiteral.new(token: @curtoken)
       array.elements = parse_expression_list(Token::RBRACKET)
 
       array
     }
+  end
 
-    parse_hash_literal = lambda {
+  def parse_hash_literal
+    lambda {
       hash = HashLiteral.new(token: @curtoken)
       hash.pairs = {}
 
@@ -162,30 +175,10 @@ class Parser
 
       hash
     }
+  end
 
-    def parse_expression_list(end_of_list_token)
-      list = []
-
-      if peek_token_is?(end_of_list_token)
-        next_token
-        return list
-      end
-
-      next_token
-      list.append(parse_expression(LOWEST))
-
-      while peek_token_is?(Token::COMMA)
-        next_token
-        next_token
-        list.append(parse_expression(LOWEST))
-      end
-
-      return nil unless expect_peek(end_of_list_token)
-
-      list
-    end
-
-    parse_index_expression = lambda { |left|
+  def parse_index_expression
+    lambda { |left|
       exp = IndexExpression.new(token: @curtoken, left: left)
 
       next_token
@@ -195,7 +188,41 @@ class Parser
 
       exp
     }
+  end
 
+  def parse_expression_list(end_of_list_token)
+    list = []
+
+    if peek_token_is?(end_of_list_token)
+      next_token
+      return list
+    end
+
+    next_token
+    list.append(parse_expression(LOWEST))
+
+    while peek_token_is?(Token::COMMA)
+      next_token
+      next_token
+      list.append(parse_expression(LOWEST))
+    end
+
+    return nil unless expect_peek(end_of_list_token)
+
+    list
+  end
+
+  def register_prefix(token_type, fn)
+    @prefix_parse_fns.store(token_type, fn)
+  end
+
+  def register_infix(token_type, fn)
+    @infix_parse_fns.store(token_type, fn)
+  end
+
+  def register_parsing_functions
+    @prefix_parse_fns = {}
+    @infix_parse_fns = {}
     register_prefix(Token::IDENT, parse_identifier)
     register_prefix(Token::INT, parse_integer_literal)
     register_prefix(Token::BANG, parse_prefix_expression)
@@ -221,6 +248,14 @@ class Parser
     register_prefix(Token::LBRACE, parse_hash_literal)
   end
 
+  def initialize(lexer)
+    @l = lexer
+    @errors = []
+    register_parsing_functions
+    next_token
+    next_token
+  end
+
   def peek_precedence
     if (p = PRECEDENCES[@peek_token.token_type])
       p
@@ -237,7 +272,6 @@ class Parser
     end
   end
 
-  ## tt: tokentype
   def peek_error(tok)
     msg = "expected next token to be #{tok}, got #{@peek_token.token_type} instead"
     @errors.append(msg)
@@ -254,7 +288,7 @@ class Parser
 
     until curtoken_is?(Token::EOF)
       stmt = parse_statement
-      program.statements.push(stmt) if stmt != nil
+      program.statements.push(stmt) if !stmt.nil?
       next_token
     end
 
@@ -398,14 +432,6 @@ class Parser
     return nil unless expect_peek(Token::RPAREN)
 
     args
-  end
-
-  def register_prefix(token_type, fn)
-    @prefix_parse_fns.store(token_type, fn)
-  end
-
-  def register_infix(token_type, fn)
-    @infix_parse_fns.store(token_type, fn)
   end
 
   def no_prefix_parse_fn_error(tokentype)
