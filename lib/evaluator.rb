@@ -266,7 +266,9 @@ def evaluate(node, env)
     node.value
   when ArrayLiteral
     elements = eval_expressions(node.elements, env)
+
     return elements[0] if elements.length == 1 && is_error(elements[0])
+
     elements
   when IndexExpression
     left = evaluate(node.left, env)

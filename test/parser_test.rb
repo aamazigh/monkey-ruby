@@ -7,7 +7,7 @@ require_relative('../lib/parser')
 
 class TestParser < MiniTest::Test
   def check_parser_errors(parser)
-    errors = parser.Errors
+    errors = parser.errors
 
     return if errors.empty?
 
@@ -99,7 +99,7 @@ return true;
 '
     l = Lexer.new(input)
     p = Parser.new(l)
-    puts p.Errors
+    puts p.errors
     program = p.parse_program
     check_parser_errors(p)
 

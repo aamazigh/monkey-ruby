@@ -19,8 +19,8 @@ class Repl
 
       program = p.parse_program
 
-      if p.Errors.length != 0
-        print_parser_errors(p.Errors)
+      if p.errors.length != 0
+        print_parser_errors(p.errors)
         next
       end
 

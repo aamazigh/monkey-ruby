@@ -120,7 +120,7 @@ class TestNextToken < MiniTest::Test
 
     l = Lexer.new(input)
     tests.each do |expected|
-      tok = l.NextToken
+      tok = l.lexer_next_token
       assert_equal [expected.token_type, expected.literal], [tok.token_type, tok.literal]
     end
   end

@@ -71,7 +71,7 @@ class Lexer
   # TODO: there is another function next_token in parser.rb. should I
   # refactor the code with namespaces?
 
-  def NextToken
+  def lexer_next_token
     @token = Token.new
     skip_whitespace
     case @ch

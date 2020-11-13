@@ -5,6 +5,7 @@ require_relative('lexer')
 require_relative('token')
 
 class Parser
+  attr_reader :errors
 
   # Precedences
   LOWEST = 1
@@ -236,10 +237,6 @@ class Parser
     end
   end
 
-  def Errors
-    @errors
-  end
-
   ## tt: tokentype
   def peek_error(tok)
     msg = "expected next token to be #{tok}, got #{@peek_token.token_type} instead"
@@ -248,7 +245,7 @@ class Parser
 
   def next_token
     @curtoken = @peek_token
-    @peek_token = @l.NextToken
+    @peek_token = @l.lexer_next_token
   end
 
   def parse_program
@@ -288,7 +285,6 @@ class Parser
     next_token
 
     stmt.value = parse_expression(LOWEST)
-    #    next_token until curtoken_is?(Token::SEMICOLON)
 
     next_token if peek_token_is?(Token::SEMICOLON)
 
