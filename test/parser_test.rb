@@ -38,28 +38,28 @@ class TestParser < MiniTest::Test
 
   def identifier_test_helper(expression, value)
     assert_equal value, expression.value
-    assert_equal value, expression.TokenLiteral
+    assert_equal value, expression.token_literal
   end
 
   def integer_literal_test_helper(expression, value)
     assert_equal value, expression.value
-    assert_equal value.to_s, expression.TokenLiteral
+    assert_equal value.to_s, expression.token_literal
   end
 
   def boolean_literal_test_helper(expression, value)
     assert_equal value, expression.value
-    assert_equal value.to_s, expression.TokenLiteral
+    assert_equal value.to_s, expression.token_literal
   end
 
   def let_statement_test_helper(statement, name)
-    assert_equal 'let', statement.TokenLiteral
+    assert_equal 'let', statement.token_literal
     assert_equal name, statement.name.value
-    assert_equal name, statement.name.TokenLiteral
+    assert_equal name, statement.name.token_literal
   end
 
   def boolean_literal_test_helper(expression, value)
     assert_equal value, expression.value
-    assert_equal value.to_s, expression.TokenLiteral
+    assert_equal value.to_s, expression.token_literal
   end
 
   def test_let_statements
@@ -108,7 +108,7 @@ return true;
     assert_equal 4, program.statements.length
 
     program.statements.each do |return_stmt|
-      assert_equal 'return', return_stmt.TokenLiteral
+      assert_equal 'return', return_stmt.token_literal
     end
   end
 

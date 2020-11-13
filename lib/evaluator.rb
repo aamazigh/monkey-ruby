@@ -1,3 +1,5 @@
+# frozen_string_literal = true
+
 require_relative('evaluator/builtins')
 require_relative('object')
 
@@ -16,8 +18,8 @@ module Evaluator
   def eval_minus_prefix_operator_expression(right)
     if right.type != INTEGER_OBJ
       Error.new("unknown operator: -#{right.type}")
-    else
-      return -right if right.is_a?(Integer)
+    elsif right.is_a?(Integer)
+      -right
     end
   end
 
@@ -73,15 +75,15 @@ module Evaluator
 
   def eval_if_expression(ie, env)
     condition = evaluate(ie.condition, env)
-    return condition if is_error(condition)
+    return condition if error_obj?(condition)
 
-    if is_truthy(condition) then evaluate(ie.consequence, env)
+    if truthy?(condition) then evaluate(ie.consequence, env)
     elsif !ie.alternative.nil?
       evaluate(ie.alternative, env)
     end
   end
 
-  def is_truthy(obj)
+  def truthy?(obj)
     case obj
     when nil then false
     when true then true
@@ -126,7 +128,7 @@ module Evaluator
   def eval_identifier(node, env)
     val = env.get_val(node.value)
 
-    if builtin = $builtins[node.value]
+    if (builtin = BUILTINS[node.value])
       return builtin
     end
 
@@ -135,7 +137,7 @@ module Evaluator
     val
   end
 
-  def is_error(obj)
+  def error_obj?(obj)
     return obj.type == ERROR_OBJ unless obj.nil?
 
     false
@@ -146,7 +148,7 @@ module Evaluator
 
     exps.each do |e|
       evaluated = evaluate(e, env)
-      return evaluated if is_error(evaluated)
+      return evaluated if error_obj?(evaluated)
 
       result.append(evaluated)
     end
@@ -223,15 +225,15 @@ def evaluate(node, env)
     node.value
   when PrefixExpression
     right = evaluate(node.right, env)
-    return right if is_error(right)
+    return right if error_obj?(right)
 
     eval_prefix_expression(node.operator, right)
   when InfixExpression
     left = evaluate(node.left, env)
-    return left if is_error(left)
+    return left if error_obj?(left)
 
     right = evaluate(node.right, env)
-    return right if is_error(right)
+    return right if error_obj?(right)
 
     eval_infix_expression(node.operator, left, right)
   when BlockStatement
@@ -240,12 +242,12 @@ def evaluate(node, env)
     eval_if_expression(node, env)
   when ReturnStatement
     val = evaluate(node.return_value, env)
-    return val if is_error(val)
+    return val if error_obj?(val)
 
     ReturnValue.new(value: val)
   when LetStatement
     val = evaluate(node.value, env)
-    return val if is_error(val)
+    return val if error_obj?(val)
 
     env.set_val(node.name.value, val)
   when Identifier
@@ -256,10 +258,10 @@ def evaluate(node, env)
     Function.new(params, body, env)
   when CallExpression
     function = evaluate(node.function, env)
-    return function if is_error(function)
+    return function if error_obj?(function)
 
     args = eval_expressions(node.arguments, env)
-    return args[0] if args.length == 1 && is_error(args[0])
+    return args[0] if args.length == 1 && error_obj?(args[0])
 
     apply_function(function, args)
   when StringLiteral
@@ -267,16 +269,16 @@ def evaluate(node, env)
   when ArrayLiteral
     elements = eval_expressions(node.elements, env)
 
-    return elements[0] if elements.length == 1 && is_error(elements[0])
+    return elements[0] if elements.length == 1 && error_obj?(elements[0])
 
     elements
   when IndexExpression
     left = evaluate(node.left, env)
-    return left if is_error(left)
+    return left if error_obj?(left)
 
     index = evaluate(node.index, env)
 
-    return index if is_error(index)
+    return index if error_obj?(index)
 
     eval_index_expression(left, index)
 

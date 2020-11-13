@@ -5,7 +5,6 @@ require_relative('lexer')
 require_relative('token')
 
 class Parser
-  attr_reader :errors
 
   # Precedences
   LOWEST = 1
@@ -30,6 +29,8 @@ class Parser
       Token::LPAREN => CALL,
       Token::LBRACKET => INDEX
     }
+
+  attr_reader :errors
 
   def parse_identifier
     lambda {

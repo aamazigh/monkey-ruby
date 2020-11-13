@@ -1,5 +1,3 @@
-# use ruby's Integer and Boolean classes that have inpect
-
 RETURN_VALUE_OBJ = 'RETURN_VALUE'
 INTEGER_OBJ = 'INTEGER'
 ERROR_OBJ = 'ERROR'

@@ -1,14 +1,4 @@
-class Node
-  def TokenLiteral; end
-end
-
-class Statement < Node
-  def statemendNode; end
-end
-
-class Expression < Node
-  def expressionNode;  end
-end
+# frozen_string_literal: false
 
 class Program
   attr_accessor :statements
@@ -17,9 +7,9 @@ class Program
     @statements = statements
   end
 
-  def TokenLiteral
+  def token_literal
     if len(@statements) > 0
-      @statements[0].TokenLiteral
+      @statements[0].token_literal
     else
       ''
     end
@@ -34,7 +24,7 @@ class Program
   end
 end
 
-class LetStatement < Statement
+class LetStatement
   attr_accessor :token, :name, :value
 
   def initialize(token: nil, name: nil, value: nil)
@@ -43,9 +33,7 @@ class LetStatement < Statement
     @value = value
   end
 
-  def statementNode; end
-
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -57,7 +45,7 @@ class LetStatement < Statement
   end
 end
 
-class Identifier < Expression
+class Identifier
   attr_accessor :token, :value
 
   def initialize(token: nil, value: nil)
@@ -65,9 +53,7 @@ class Identifier < Expression
     @value = value
   end
 
-  def expressionNode; end
-
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -76,7 +62,7 @@ class Identifier < Expression
   end
 end
 
-class ReturnStatement < Statement
+class ReturnStatement
   attr_accessor :token, :return_value
 
   def initialize(token: nil, return_value: nil)
@@ -84,9 +70,7 @@ class ReturnStatement < Statement
     @return_value = return_value
   end
 
-  def statementNode; end
-
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -100,7 +84,7 @@ class ReturnStatement < Statement
   end
 end
 
-class ExpressionStatement < Statement
+class ExpressionStatement
   attr_accessor :token, :expression
 
   def initialize(token: nil, expression: nil)
@@ -108,12 +92,12 @@ class ExpressionStatement < Statement
     @expression = expression
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
   def string
-    @expression&.string 
+    @expression&.string
   end
 end
 
@@ -125,7 +109,7 @@ class IntegerLiteral
     @value = value
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -142,7 +126,7 @@ class Boolean
     @value = value
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -160,7 +144,7 @@ class PrefixExpression
     @right = right
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -179,7 +163,7 @@ class InfixExpression
     @operator = operator
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -198,7 +182,7 @@ class IfExpression
     @alternative = alternative
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -218,7 +202,7 @@ class BlockStatement
     @statements = statements
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -240,7 +224,7 @@ class FunctionLiteral
     @body = body
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 
@@ -264,7 +248,7 @@ class CallExpression
     @arguments = arguments
   end
 
-  def TokenLiteral
+  def token_literal
     @token.literal
   end
 

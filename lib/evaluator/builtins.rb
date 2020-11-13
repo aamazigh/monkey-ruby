@@ -1,8 +1,8 @@
 require_relative('../evaluator')
 require_relative('../object')
 
-$builtins = {}
-$builtins['len'] =
+BUILTINS = {}
+BUILTINS['len'] =
   Builtin.new(
     lambda { |*args|
       if args.length != 1
@@ -24,7 +24,7 @@ $builtins['len'] =
     }
   )
 
-$builtins['first'] =
+BUILTINS['first'] =
   Builtin.new(
     lambda { |*args|
       if args.length != 1
@@ -47,7 +47,7 @@ $builtins['first'] =
     }
   )
 
-$builtins['last'] =
+BUILTINS['last'] =
   Builtin.new(
     lambda { |*args|
       if args.length != 1
@@ -70,7 +70,7 @@ $builtins['last'] =
     }
   )
 
-$builtins['rest'] =
+BUILTINS['rest'] =
   Builtin.new(
     lambda { |*args|
       if args.length != 1
@@ -93,7 +93,7 @@ $builtins['rest'] =
     }
   )
 
-$builtins['push'] =
+BUILTINS['push'] =
   Builtin.new(
     lambda { |*args|
       if args.length != 2
