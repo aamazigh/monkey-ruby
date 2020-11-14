@@ -9,7 +9,7 @@ require_relative('../lib/object/environment')
 
 class Repl
   include Evaluator
-  def run
+  def self.run
     puts 'Welcome to the ruby implementation of the Monkey programming language!'
     env = Environment.new
     while line = Readline.readline('>> ', true)
