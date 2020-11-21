@@ -167,122 +167,122 @@ module Evaluator
       Error.new("not a function: #{function.type}")
     end
   end
-end
 
-def new_enclosed_environment(outer)
-  return Error.new("not an environment: #{outer.type}") unless outer.is_a?(Environment)
+  def new_enclosed_environment(outer)
+    return Error.new("not an environment: #{outer.type}") unless outer.is_a?(Environment)
 
-  env = Environment.new
-  env.outer = outer
-  env
-end
-
-def extend_function_env(fn, args)
-  # TODO: here lies the problem
-  env = Environment.new
-
-  env = new_enclosed_environment(fn.env)
-
-  fn.parameters.each_with_index do |param, param_idx|
-    env.set_val(param.value, args[param_idx])
+    env = Environment.new
+    env.outer = outer
+    env
   end
-  env
-end
 
-def unwrap_return_value(obj)
-  return obj.value if obj.is_a?(ReturnValue)
+  def extend_function_env(fn, args)
+    # TODO: here lies the problem
+    env = Environment.new
 
-  obj
-end
+    env = new_enclosed_environment(fn.env)
 
-def eval_index_expression(left, index)
-  if left.type == ARRAY_OBJ && index.type == INTEGER_OBJ
-    eval_array_index_expression(left, index)
-  else
-    Error.new("index operator not supported: #{left.type}")
+    fn.parameters.each_with_index do |param, param_idx|
+      env.set_val(param.value, args[param_idx])
+    end
+    env
   end
-end
 
-def eval_array_index_expression(array, index)
-  max = array.length - 1
+  def unwrap_return_value(obj)
+    return obj.value if obj.is_a?(ReturnValue)
 
-  return nil if index < 0 || index > max
+    obj
+  end
 
-  array[index]
-end
+  def eval_index_expression(left, index)
+    if left.type == ARRAY_OBJ && index.type == INTEGER_OBJ
+      eval_array_index_expression(left, index)
+    else
+      Error.new("index operator not supported: #{left.type}")
+    end
+  end
 
-# TODO: Evaluating hashes
+  def eval_array_index_expression(array, index)
+    max = array.length - 1
 
-def evaluate(node, env)
-  case node
-  when Program
-    eval_program(node.statements, env)
-  when ExpressionStatement
-    evaluate(node.expression, env)
-  when IntegerLiteral
-    node.value
-  when Boolean
-    node.value
-  when PrefixExpression
-    right = evaluate(node.right, env)
-    return right if error_obj?(right)
+    return nil if index < 0 || index > max
 
-    eval_prefix_expression(node.operator, right)
-  when InfixExpression
-    left = evaluate(node.left, env)
-    return left if error_obj?(left)
+    array[index]
+  end
 
-    right = evaluate(node.right, env)
-    return right if error_obj?(right)
+  # TODO: Evaluating hashes
 
-    eval_infix_expression(node.operator, left, right)
-  when BlockStatement
-    eval_block_statement(node.statements, env)
-  when IfExpression
-    eval_if_expression(node, env)
-  when ReturnStatement
-    val = evaluate(node.return_value, env)
-    return val if error_obj?(val)
+  def evaluate(node, env)
+    case node
+    when Program
+      eval_program(node.statements, env)
+    when ExpressionStatement
+      evaluate(node.expression, env)
+    when IntegerLiteral
+      node.value
+    when Boolean
+      node.value
+    when PrefixExpression
+      right = evaluate(node.right, env)
+      return right if error_obj?(right)
 
-    ReturnValue.new(value: val)
-  when LetStatement
-    val = evaluate(node.value, env)
-    return val if error_obj?(val)
+      eval_prefix_expression(node.operator, right)
+    when InfixExpression
+      left = evaluate(node.left, env)
+      return left if error_obj?(left)
 
-    env.set_val(node.name.value, val)
-  when Identifier
-    eval_identifier(node, env)
-  when FunctionLiteral
-    params = node.parameters
-    body = node.body
-    Function.new(params, body, env)
-  when CallExpression
-    function = evaluate(node.function, env)
-    return function if error_obj?(function)
+      right = evaluate(node.right, env)
+      return right if error_obj?(right)
 
-    args = eval_expressions(node.arguments, env)
-    return args[0] if args.length == 1 && error_obj?(args[0])
+      eval_infix_expression(node.operator, left, right)
+    when BlockStatement
+      eval_block_statement(node.statements, env)
+    when IfExpression
+      eval_if_expression(node, env)
+    when ReturnStatement
+      val = evaluate(node.return_value, env)
+      return val if error_obj?(val)
 
-    apply_function(function, args)
-  when StringLiteral
-    node.value
-  when ArrayLiteral
-    elements = eval_expressions(node.elements, env)
+      ReturnValue.new(value: val)
+    when LetStatement
+      val = evaluate(node.value, env)
+      return val if error_obj?(val)
 
-    return elements[0] if elements.length == 1 && error_obj?(elements[0])
+      env.set_val(node.name.value, val)
+    when Identifier
+      eval_identifier(node, env)
+    when FunctionLiteral
+      params = node.parameters
+      body = node.body
+      Function.new(params, body, env)
+    when CallExpression
+      function = evaluate(node.function, env)
+      return function if error_obj?(function)
 
-    elements
-  when IndexExpression
-    left = evaluate(node.left, env)
-    return left if error_obj?(left)
+      args = eval_expressions(node.arguments, env)
+      return args[0] if args.length == 1 && error_obj?(args[0])
 
-    index = evaluate(node.index, env)
+      apply_function(function, args)
+    when StringLiteral
+      node.value
+    when ArrayLiteral
+      elements = eval_expressions(node.elements, env)
 
-    return index if error_obj?(index)
+      return elements[0] if elements.length == 1 && error_obj?(elements[0])
 
-    eval_index_expression(left, index)
+      elements
+    when IndexExpression
+      left = evaluate(node.left, env)
+      return left if error_obj?(left)
 
-  else
-    false
+      index = evaluate(node.index, env)
+
+      return index if error_obj?(index)
+
+      eval_index_expression(left, index)
+
+    else
+      false
+    end
   end
 end

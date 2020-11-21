@@ -6,6 +6,7 @@ require_relative('../lib/lexer')
 require_relative('../lib/parser')
 
 class TestParser < MiniTest::Test
+  # helper functions for the tests
   def check_parser_errors(parser)
     errors = parser.errors
 
@@ -19,11 +20,12 @@ class TestParser < MiniTest::Test
   end
 
   def literal_expression_test_helper(expression, expected)
-    if expected.is_a?(Integer)
+    case expected
+    when Integer
       integer_literal_test_helper(expression, expected)
-    elsif expected.is_a?(String)
+    when String
       identifier_test_helper(expression, expected)
-    elsif expected.is_a?(TrueClass) || expected.is_a?(FalseClass)
+    when TrueClass, FalseClass
       boolean_literal_test_helper(expression, expected)
     else
       puts 'error'
@@ -57,11 +59,7 @@ class TestParser < MiniTest::Test
     assert_equal name, statement.name.token_literal
   end
 
-  def boolean_literal_test_helper(expression, value)
-    assert_equal value, expression.value
-    assert_equal value.to_s, expression.token_literal
-  end
-
+  # the tests
   def test_let_statements
     input = Struct.new(:input, :expected_identifier, :expected_value)
 
@@ -405,7 +403,6 @@ true;
   end
 
   def test_call_expression_parsing
-
     input = 'add(1, 2 * 3, 4 + 5);'
     l = Lexer.new(input)
     p = Parser.new(l)
@@ -413,13 +410,13 @@ true;
     check_parser_errors(p)
 
     assert_equal 1, program.statements.length,
-                 'we should have 1 statement. got #{program.statements.length}'
+                 "we should have 1 statement. got #{program.statements.length}"
 
     exp = program.statements[0].expression
     identifier_test_helper(exp.function, 'add')
 
     assert_equal 3, exp.arguments.length,
-                 'wrong length of arguments. got=#{exp.arguments.length}'
+                 "wrong length of arguments. got=#{exp.arguments.length}"
 
     literal_expression_test_helper(exp.arguments[0], 1)
     infix_expression_test_helper(exp.arguments[1], 2, '*', 3)

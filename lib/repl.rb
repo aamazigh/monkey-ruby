@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'readline'
 require_relative('../lib/lexer')
 require_relative('../lib/parser')
@@ -6,9 +8,9 @@ require_relative('../lib/object')
 require_relative('../lib/object/environment')
 
 # TODO: improve editing functionalities of the REPL
+include Evaluator
 
 class Repl
-  include Evaluator
   def self.run
     puts 'Welcome to the ruby implementation of the Monkey programming language!'
     env = Environment.new
