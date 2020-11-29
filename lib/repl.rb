@@ -33,7 +33,7 @@ class Repl
 
   private
 
-  def print_parser_errors(errors)
+  def self.print_parser_errors(errors)
     errors.each do |err|
       puts "\t" + err + "\n"
     end
