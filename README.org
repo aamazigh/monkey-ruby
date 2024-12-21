@@ -1,5 +1,5 @@
 * Monkey Ruby
-  A interpreter for the [[https://interpreterbook.com/index.html#the-monkey-programming-language][Monkey]] Programming Language written in Ruby.
+  An interpreter for the [[https://interpreterbook.com/index.html#the-monkey-programming-language][Monkey]] Programming Language written in Ruby.
   It is based on the book [[https://interpreterbook.com/][Writing An Interpreter in Go.]]
 
 The code contains a lexer, a recusive descent parser (Pratt parser) that generates an Absract Syntax Tree, and a REPL.  
