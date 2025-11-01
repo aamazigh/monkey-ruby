@@ -6,5 +6,33 @@ The code contains a lexer, a recusive descent parser (Pratt parser) that generat
 
 No external dependencies were used in writing the interpreter, except for the Ruby unit testing framework [[https://github.com/minitest/minitest][minitest]]. 
 
+** Running the REPL 
+First, install ruby on your machine. 
 
-  
+To launch the REPL:
+#+BEGIN_SRC bash
+./bin/rbmonkey
+
+Welcome to the ruby implementation of the Monkey programming language!
+>> 
+#+END_SRC
+
+Testing function closures:
+
+#+BEGIN_SRC bash
+Welcome to the ruby implementation of the Monkey programming language!
+>> let newAdder = fn(a, b) { fn(c) { a + b + c}; };
+fn(a, b) {
+fn(c){ ((a + b) + c) }
+}
+
+>> let adder = newAdder(1, 2);
+fn(c) {
+((a + b) + c)
+}
+
+>> adder(8) 
+11
+#+END_SRC
+
+See [[https://monkeylang.org/#what-is-monkey][What is Monkey]] for further information about the language.  
